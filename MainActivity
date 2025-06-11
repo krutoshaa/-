@@ -1,0 +1,86 @@
+package com.example.projectx
+
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+
+
+        val userLogin: EditText = findViewById(R.id.user_login)
+        val userEmail: EditText = findViewById(R.id.user_email)
+        val userPass: EditText = findViewById(R.id.user_pass)
+        val button: Button = findViewById(R.id.button_reg)
+
+        val userInstitute: Spinner = findViewById(R.id.spinner_institute)
+        val userWay: Spinner = findViewById(R.id.spinner_way)
+        val userGroup: Spinner = findViewById(R.id.spinner_group)
+        val userCourse: Spinner = findViewById(R.id.spinner_course)
+
+        val institute = arrayOf("Институт1", "Институт2 ", "Институт3")
+        val way = arrayOf("Направление1", "Направление2 ", "Направление3")
+        val group = arrayOf("Группа1", "Группа2 ", "Группа3")
+        val course = arrayOf("1", "2 ", "3")
+
+        val instituteAdapter = ArrayAdapter(this, android.R.layout.simple_selectable_list_item, institute)
+        val wayAdapter = ArrayAdapter(this, android.R.layout.simple_selectable_list_item, way)
+        val groupAdapter = ArrayAdapter(this, android.R.layout.simple_selectable_list_item, group)
+        val courseAdapter = ArrayAdapter(this, android.R.layout.simple_selectable_list_item, course)
+
+        userInstitute.adapter = instituteAdapter
+        userWay.adapter = wayAdapter
+        userGroup.adapter = groupAdapter
+        userCourse.adapter = courseAdapter
+
+        val linkToAuth: TextView = findViewById(R.id.link_to_auth)
+
+        linkToAuth.setOnClickListener {
+            val intent = Intent(this, AuthActivity2::class.java)
+            startActivity(intent)
+        }
+
+        button.setOnClickListener {
+            var login = userLogin.text.toString().trim()
+            var email = userEmail.text.toString().trim()
+            var pass = userPass.text.toString().trim()
+
+            var institute = userInstitute.selectedItem.toString().trim()
+            var way = userWay.selectedItem.toString().trim()
+            var group = userGroup.selectedItem.toString().trim()
+            var course = userCourse.selectedItem.toString().trim()
+
+            if (login == " " || email ==" " || pass == " " || institute==" " || way == " " || group == " " || course == " ")
+                Toast.makeText(this, "Не все поля заполнены", Toast.LENGTH_LONG ).show()
+            else {
+                val user = User(login, email, pass, institute,way,group, course)
+
+                val db = DbHelper(this, null)
+                db.adduser(user)
+
+               // intent.putExtra("SPINNER_INSTITUTE",institute ) // Передаем институт
+                Toast.makeText(this, "Пользователь $login добавлен", Toast.LENGTH_LONG ).show()
+
+                userLogin.text.clear()
+                userEmail.text.clear()
+                userPass.text.clear()
+            }
+
+        }
+
+
+    }
+}
