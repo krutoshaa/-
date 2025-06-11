@@ -1,0 +1,71 @@
+package com.example.projectx
+import android.os.Bundle
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.internal.ViewUtils.hideKeyboard
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
+import android.widget.Spinner
+import android.widget.TextView
+
+private lateinit var editStatus: EditText
+private val sharedPrefKey = "savedText"
+private val sharedPrefFile = "myAppPrefs"
+
+
+
+class AccActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_acc)
+// Получаем логин из Intent
+        val userLogin = intent.getStringExtra("USER_LOGIN") ?: "Гость"
+
+        // Находим TextView и устанавливаем логин
+        val userNameTextView: TextView = findViewById(R.id.user_name_text_view)
+        userNameTextView.text = userLogin  // Устанавливаем текст
+
+      //  val institute = intent.getStringExtra("USER_INSTITUTE") ?: ""
+
+        // Находим TextView и устанавливаем институт
+     //   val userInstitute: TextView = findViewById(R.id.institute_text_view)
+     //   userInstitute.text = institute  // Устанавливаем текст
+
+        editStatus = findViewById(R.id.status)
+
+// Устанавливаем максимальную длину (например, 30 символов)
+        val maxLength = 30
+        editStatus.filters = arrayOf<InputFilter>(LengthFilter(maxLength))
+
+        // Загрузка сохранённого текста
+        val sharedPref = getSharedPreferences(sharedPrefFile, MODE_PRIVATE)
+        editStatus.setText(sharedPref.getString(sharedPrefKey, ""))
+
+        // Автосохранение при изменении текста
+        editStatus.setOnEditorActionListener { _, _, _ ->
+            saveText()
+            false
+        }
+
+        // Альтернатива: сохранять при потере фокуса
+        editStatus.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) saveText()
+        }
+    }
+    private fun saveText() {
+        val text = editStatus.text.toString()
+        getSharedPreferences(sharedPrefFile, MODE_PRIVATE).edit()
+            .putString(sharedPrefKey, text)
+            .apply()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveText()  // Дополнительное сохранение при сворачивании приложения
+    }
+}
