@@ -1,0 +1,6 @@
+(КЛАСС ЮЗЕР)
+package com.example.projectx
+
+data class User
+    (val login: String, val email: String, val pass: String, val institute: String = "", val way: String = "", val group: String = "", val course: String = "") {
+}
